@@ -25,23 +25,25 @@ public class Player2 implements ActionListener {
     private Image imagem;
     ImageIcon referencia = new ImageIcon("imagens//NaveAzul.gif");
     private int altura, largura;
+    private ImageIcon tiroRef = new ImageIcon("imagens//atkespecialplayer.png");
     private List<AtaquePlayer> tiros;
     private boolean isVisivel;
     private Timer timer;
     private boolean colisao = false;
     private boolean escudo = false;
     private int qtdAtaquesEspeciais = 0;
-    private boolean coletaBonus=false;
-    
-//    private ImageIcon tiroRef = new ImageIcon("imagens//atkespecialplayer.png");
-//    private Clip clip;
-    private int centralizado=1;
-//    private boolean coletaBonus = false;
-    private boolean comecaJogo=false;
+    private boolean coletaBonus = false;
+    private Clip clip;
+
+    // private ImageIcon tiroRef = new ImageIcon("imagens//atkespecialplayer.png");
+    // private Clip clip;
+    private int centralizado = 1;
+    // private boolean coletaBonus = false;
+    private boolean comecaJogo = false;
 
     public Player2() {
         this.x = 0;
-        this.y =800;
+        this.y = 800;
         isVisivel = true;
 
         tiros = new ArrayList<AtaquePlayer>();
@@ -50,32 +52,35 @@ public class Player2 implements ActionListener {
         timer.start();
 
     }
+
     public void centraliza() {
-    	if(this.centralizado!=1) {
-    		
-    		if((x<550 || x>560)  || (y<485|| y>490)) {
-    			
-    			if(this.y<485) {
-    				this.y+=5;
-    			}else  if(this.y>490){
-    				this.y-=5;
-    			}
-    			if(this.x<550) {
-    				this.x+=5;
-    			}else if(this.x>560){
-    				this.x-=5;
-    			}
-    			
-    		}else  {
-    			this.centralizado=1;
-    		
-    		}
-    	
-    	}
+        if (this.centralizado != 1) {
+
+            if ((x < 550 || x > 560) || (y < 485 || y > 490)) {
+
+                if (this.y < 485) {
+                    this.y += 5;
+                } else if (this.y > 490) {
+                    this.y -= 5;
+                }
+                if (this.x < 550) {
+                    this.x += 5;
+                } else if (this.x > 560) {
+                    this.x -= 5;
+                }
+
+            } else {
+                this.centralizado = 1;
+
+            }
+
+        }
     }
+
     public void setCentralizado(int x) {
-    	this.centralizado=x;
+        this.centralizado = x;
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (colisao == true) {
@@ -118,64 +123,56 @@ public class Player2 implements ActionListener {
         dadosImagem();
     }
 
-//    public void tiroEspecial() {
-//        this.tiros.add(new AtaquePlayer(this.x, this.y, tiroRef));
-//        referencia = new ImageIcon("imagens//NaveAzulAtkEspecial.gif");
-//        dadosImagem();
-//        this.qtdAtaquesEspeciais -= 1;
-//
-//    }
-
-//    public void playSound() {
-//        if (clip != null) {
-//            clip.start();
-//        }
-//    }
-//
-//    public void stopSound() {
-//        if (clip != null) {
-//            clip.stop();
-//        }
-//    }
-//
-//    public void coletaBonus() {
-//        this.coletaBonus = true;
-//    }
-//
     public Rectangle getLimites() {
         return new Rectangle(x, y, largura, altura);
     }
+
+    public void playSound() {
+        if (clip != null) {
+            clip.start();
+        }
+    }
+
+    public void stopSound() {
+        if (clip != null) {
+            clip.stop();
+        }
+    }
+
+    public void tiroEspecial() {
+        this.tiros.add(new AtaquePlayer(this.x, this.y, tiroRef));
+        referencia = new ImageIcon("imagens//NaveVermelhaAtkEspecial.gif");
+        dadosImagem();
+
+    }
+
     public Rectangle zerarColisao() {
-    	 return new Rectangle(x, y, 0, 0);
+        return new Rectangle(x, y, 0, 0);
     }
 
     public void keyPressed(KeyEvent tecla) {
         int codigo = tecla.getKeyCode();
 
-        if (codigo == KeyEvent.VK_BACK_SPACE) {
+        if (codigo == KeyEvent.VK_ENTER) {
             if (isVisivel) {
-//                try {
-////                    File audioFile = new File("sons//somTiro.wav");
-////                    AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-//
-//                    clip = AudioSystem.getClip();
-//                    clip.open(audioStream);
-//                } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    File audioFile = new File("sons//somTiro.wav");
+                    AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
 
-//                playSound();
-//                if (qtdAtaquesEspeciais == 0) {
-//                    tiroSimples();
-//                } else if (qtdAtaquesEspeciais != 0) {
-//                    tiroEspecial();
-//                }
+                    clip = AudioSystem.getClip();
+                    clip.open(audioStream);
+                } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+                    e.printStackTrace();
+                }
+
+                playSound();
+
+                if (qtdAtaquesEspeciais == 0) {
+                    tiroSimples();
+                } else if (qtdAtaquesEspeciais != 0) {
+                    tiroEspecial();
+                }
             }
-
-        }
-        if (codigo == KeyEvent.VK_E) {
-            tiroSimples();
-
         }
 
         if (codigo == KeyEvent.VK_UP) {
@@ -227,9 +224,11 @@ public class Player2 implements ActionListener {
     public int getX() {
         return x;
     }
+
     public void coletaBonus() {
         this.coletaBonus = true;
     }
+
     public int getY() {
         return y;
     }
@@ -238,9 +237,9 @@ public class Player2 implements ActionListener {
         return imagem;
     }
 
-//    public void setAtaqueEspecial(int n) {
-//        this.qtdAtaquesEspeciais += n;
-//    }
+    // public void setAtaqueEspecial(int n) {
+    // this.qtdAtaquesEspeciais += n;
+    // }
 
     public void setEscudo(boolean e) {
         this.escudo = e;
@@ -265,11 +264,17 @@ public class Player2 implements ActionListener {
     public boolean isVisivel() {
         return isVisivel;
     }
+
     public boolean getColisao() {
-    	return this.colisao;
+        return this.colisao;
     }
+
     public void setVisivel(boolean isVisivel) {
         this.isVisivel = isVisivel;
+    }
+
+    public void setAtaqueEspecial(int n) {
+        this.qtdAtaquesEspeciais += n;
     }
 
 }

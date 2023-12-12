@@ -6,10 +6,17 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
@@ -25,9 +32,11 @@ public class Player implements ActionListener {
     private boolean colisao = false;
     private boolean escudo = false;
     private ImageIcon tiroRef = new ImageIcon("imagens//atkespecialplayer.png");
-    private int centralizado=1;
-    private boolean comecaJogo=false;
-    private boolean coletaBonus=false;
+    private int centralizado = 1;
+    private boolean comecaJogo = false;
+    private boolean coletaBonus = false;
+    private int qtdAtaquesEspeciais;
+    private Clip clip;
 
     public Player() {
         this.x = 700;
@@ -40,36 +49,41 @@ public class Player implements ActionListener {
         timer.start();
 
     }
+
     public void coletaBonus() {
         this.coletaBonus = true;
     }
+
     public void centraliza() {
-    	if(this.centralizado!=1) {
-    		
-    		if((x<650 || x>670)  || (y<500 || y>520)) {
-    			if(this.y<500) {
-    				this.y+=5;
-    			}else {
-    				this.y-=5;
-    			}
-    			if(this.x<650) {
-    				this.x+=5;
-    			}else {
-    				this.x-=5;
-    			}
-    			
-    		}else {
-    			this.centralizado=1;
-    			this.comecaJogo=true;
-    		}
-    	}
+        if (this.centralizado != 1) {
+
+            if ((x < 650 || x > 670) || (y < 500 || y > 520)) {
+                if (this.y < 500) {
+                    this.y += 5;
+                } else {
+                    this.y -= 5;
+                }
+                if (this.x < 650) {
+                    this.x += 5;
+                } else {
+                    this.x -= 5;
+                }
+
+            } else {
+                this.centralizado = 1;
+                this.comecaJogo = true;
+            }
+        }
     }
+
     public boolean getComecaJogo() {
-    	return this.comecaJogo;
+        return this.comecaJogo;
     }
+
     public void setCentralizado(int x) {
-    	this.centralizado=x;
+        this.centralizado = x;
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (colisao == true) {
@@ -100,11 +114,10 @@ public class Player implements ActionListener {
     }
 
     public void movimentaInicio() {
-        if(this.y > -150 || this.x < 1450){
+        if (this.y > -150 || this.x < 1450) {
             x += 1;
             y -= 3;
-        }
-        else{
+        } else {
             this.x = 1100;
             this.y = 750;
         }
@@ -131,6 +144,18 @@ public class Player implements ActionListener {
 
     }
 
+    public void playSound() {
+        if (clip != null) {
+            clip.start();
+        }
+    }
+
+    public void stopSound() {
+        if (clip != null) {
+            clip.stop();
+        }
+    }
+
     public Rectangle getLimites() {
         return new Rectangle(x, y, largura, altura);
     }
@@ -138,8 +163,26 @@ public class Player implements ActionListener {
     public void keyPressed(KeyEvent tecla) {
         int codigo = tecla.getKeyCode();
 
-        if (codigo == KeyEvent.VK_X) {
-            tiroSimples();
+        if (codigo == KeyEvent.VK_SPACE) {
+            if (isVisivel) {
+                try {
+                    File audioFile = new File("sons//somTiro.wav");
+                    AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+
+                    clip = AudioSystem.getClip();
+                    clip.open(audioStream);
+                } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+                    e.printStackTrace();
+                }
+
+                playSound();
+
+                if (qtdAtaquesEspeciais == 0) {
+                    tiroSimples();
+                } else if (qtdAtaquesEspeciais != 0) {
+                    tiroEspecial();
+                }
+            }
 
         }
 
@@ -205,6 +248,10 @@ public class Player implements ActionListener {
         return y;
     }
 
+    public void setAtaqueEspecial(int n) {
+        this.qtdAtaquesEspeciais += n;
+    }
+
     public Image getImagem() {
         return imagem;
     }
@@ -216,9 +263,11 @@ public class Player implements ActionListener {
     public boolean getEscudo() {
         return this.escudo;
     }
+
     public boolean getColisao() {
-    	return this.colisao;
+        return this.colisao;
     }
+
     public List<AtaquePlayer> getTiros() {
         return tiros;
     }

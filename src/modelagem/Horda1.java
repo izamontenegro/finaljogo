@@ -37,7 +37,7 @@ public class Horda1 extends JPanel implements ActionListener {
     }
 
     public void inicializaInimigosAzuis() {
-        int quantidade[] = new int[10];
+        int quantidade[] = new int[5];
         inimigoAzul = new ArrayList<InimigoAzul>();
 
         for (int i = 0; i < quantidade.length; i++) {

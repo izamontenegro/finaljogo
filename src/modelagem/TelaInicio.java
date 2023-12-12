@@ -12,6 +12,12 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -60,6 +66,7 @@ public class TelaInicio extends JPanel implements ActionListener {
 	private int abateInimigoAzul = 0;
 	private boolean emJogo = false;
 	private Coracao coracao;
+	private Clip clip;
 	// private List<Asteroide> asteroides;
 	// private List<InimigoAzul> inimigoAzul;
 	private Horda1 horda1;
@@ -103,91 +110,14 @@ public class TelaInicio extends JPanel implements ActionListener {
 
 			}
 		});
-		timer4.start();
 
+		timer4.start();
 		timer5 = new Timer(30, this::tirarMenu);
 		timer5.start();
 
-	}
-	// public void construirPlayer2() {
-	// if(criarPlayer2=true) {
-	// player2
-	// }
-	// }
-	// public void checarColisoes() {
-	// Rectangle formaNave = player.getLimites();
-	// Rectangle formainimigoAzul;
-	// Rectangle formaTiro;
-	// Rectangle formaAtaqueInimigoRosa;
-	// Rectangle formaInimigoRosa;
-	// Rectangle formaMeteoro;
-	// Rectangle formaAsteroides;
-	// Rectangle formaInimigoVerde;
-	// Rectangle formaInimigoLaranja;
-	// Rectangle formaEscudo;
-	//
-	//
-	//
-	// for (int i = 0; i < inimigoAzul.size(); i++) {
-	// InimigoAzul tempinimigoAzul = inimigoAzul.get(i);
-	// formainimigoAzul = tempinimigoAzul.getLimites();
-	// if (formaNave.intersects(formainimigoAzul)) {
-	// player.setVisivel(false);
-	// tempinimigoAzul.setVisible(false);
-	// vidaPlayer -= 1;
-	// player.setColisao(true);
-	// if (vidaPlayer <= 0) {
-	// emJogo = false;
-	// System.out.println(calculaPontuacao());
-	// }
-	// }
-	//
-	// }
-	//
-	//
-	// for (int i = 0; i < asteroides.size(); i++) {
-	// Asteroide tempAsteroide = asteroides.get(i);
-	// formaAsteroides = tempAsteroide.getLimites();
-	// if (formaNave.intersects(formaAsteroides)) {
-	// player.setVisivel(false);
-	// tempAsteroide.setVisible(false);
-	// vidaPlayer -= 2;
-	// player.setColisao(true);
-	// if (vidaPlayer <= 0) {
-	// emJogo = false;
-	// System.out.println(calculaPontuacao());
-	// }
-	// }
-	// }
-	//
-	// // COLISÕES ATAQUES x INIMIGOS
-	// List<AtaquePlayer> ataques = player.getTiros();
-	// for (int j = 0; j < ataques.size(); j++) {
-	// AtaquePlayer tempTiro = ataques.get(j);
-	// formaTiro = tempTiro.getLimites();
-	//
-	// for (int i = 0; i < inimigoAzul.size(); i++) {
-	// InimigoAzul tempinimigoAzul = inimigoAzul.get(i);
-	// formainimigoAzul = tempinimigoAzul.getLimites();
-	// if (formaTiro.intersects(formainimigoAzul)) {
-	// tempTiro.setVisible(false);
-	// tempinimigoAzul.setColisao(true);
-	// abateInimigoAzul += 1;
-	//
-	// }
-	// }
-	//
-	//// }
-	////
-	// for (int i = 0; i < asteroides.size(); i++) {
-	// Asteroide tempAsteroide = asteroides.get(i);
-	// formaAsteroides = tempAsteroide.getLimites();
-	// if (formaTiro.intersects(formaAsteroides)) {
-	// tempTiro.setVisible(false);
-	// }
-	// }
+		adicionaSomFundo();
 
-	// }}
+	}
 
 	public int calculaPontuacao() {
 		pontuacaoTotal = ((abateInimigoRosa * 200) + (abateInimigoAzul * 100) + (abateInimigoLaranja * 100)
@@ -212,13 +142,41 @@ public class TelaInicio extends JPanel implements ActionListener {
 		Font fontePontuacao = null;
 		try {
 
-			fontePontuacao = Font.createFont(Font.TRUETYPE_FONT, caminhoFonte).deriveFont(Font.BOLD, 45);
+			fontePontuacao = Font.createFont(Font.TRUETYPE_FONT, caminhoFonte).deriveFont(Font.BOLD, 35);
 
 		} catch (FontFormatException | IOException e) {
 
 		}
 
 		return fontePontuacao;
+	}
+
+	public void adicionaSomFundo() {
+		try {
+			File audioFile = new File("sons//somfundo.wav");
+			AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+
+			clip = AudioSystem.getClip();
+			clip.open(audioStream);
+		} catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+			e.printStackTrace();
+		}
+
+		playSound();
+
+	}
+
+	public void playSound() {
+		if (clip != null) {
+			clip.start();
+			clip.loop(Clip.LOOP_CONTINUOUSLY);
+		}
+	}
+
+	public void stopSound() {
+		if (clip != null) {
+			clip.stop();
+		}
 	}
 
 	public void inicializaEstrelas() {
@@ -414,10 +372,10 @@ public class TelaInicio extends JPanel implements ActionListener {
 							player.coletaBonus();
 							if (tempBonus.getTipo() == 1) {
 								player.setEscudo(true);
-							} else if (tempBonus.getTipo() == 2 && vidaPlayer < 6) {
-								vidaPlayer += 1;
+							} else if (tempBonus.getTipo() == 2 && this.vidaPlayer < 6) {
+								this.vidaPlayer += 1;
 							} else {
-								System.out.println("coletou");
+								player.setAtaqueEspecial(3);
 							}
 
 						}
@@ -472,10 +430,10 @@ public class TelaInicio extends JPanel implements ActionListener {
 								player2.coletaBonus();
 								if (tempBonus.getTipo() == 1) {
 									player2.setEscudo(true);
-								} else if (tempBonus.getTipo() == 2 && vidaPlayer2 < 6) {
-									vidaPlayer2 += 1;
+								} else if (tempBonus.getTipo() == 2 && this.vidaPlayer2 < 6) {
+									this.vidaPlayer2 += 1;
 								} else {
-									System.out.println("coletou");
+									player2.setAtaqueEspecial(3);
 								}
 
 							}
@@ -784,11 +742,10 @@ public class TelaInicio extends JPanel implements ActionListener {
 								player2.coletaBonus();
 								if (tempBonus.getTipo() == 1) {
 									player2.setEscudo(true);
-
 								} else if (tempBonus.getTipo() == 2 && this.vidaPlayer2 < 6) {
 									this.vidaPlayer2 += 1;
 								} else {
-									System.out.println("coletou");
+									player2.setAtaqueEspecial(3);
 								}
 
 							}
@@ -1098,7 +1055,7 @@ public class TelaInicio extends JPanel implements ActionListener {
 							} else if (tempBonus.getTipo() == 2 && this.vidaPlayer < 6) {
 								this.vidaPlayer += 1;
 							} else {
-								System.out.println("coletou");
+								player.setAtaqueEspecial(3);
 							}
 
 						}
@@ -1326,6 +1283,7 @@ public class TelaInicio extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+	
 		if (player.getComecaJogo()) {
 			player.movimenta();
 		}
@@ -1412,9 +1370,11 @@ public class TelaInicio extends JPanel implements ActionListener {
 
 	public void paint(Graphics g) {
 		Graphics2D graficos = (Graphics2D) g;
-		graficos.drawImage(fundoFaseX, 0, 0, null);
-		graficos.drawImage(player.getImagem(), player.getX(), player.getY(), this);
+			graficos.drawImage(player.getImagem(), player.getX(), player.getY(), this);
+		
+
 		List<AtaquePlayer> tiros = player.getTiros();
+		graficos.drawImage(fundoFaseX, 0, 0, null);
 
 		graficos.setFont(carregarFonte(fontFile));
 		graficos.setColor(color);
@@ -1685,14 +1645,6 @@ public class TelaInicio extends JPanel implements ActionListener {
 				player2 = null;
 				vidaPlayer2 = 0;
 			}
-
-			// Reinicialize outras variáveis e configurações necessárias
-			// ...
-
-			// Volte para a tela inicial (se precisar reinicializar mais elementos, adicione
-			// aqui)
-			// Defina a posição inicial da seta e outros elementos da tela inicial conforme
-			// necessário
 			single = false;
 			multi = false;
 			colorSingle = new Color(218, 165, 32);
@@ -1702,17 +1654,10 @@ public class TelaInicio extends JPanel implements ActionListener {
 			posicaoXSingle = 200;
 			posicaoYMulti = 480;
 			posicaoXMulti = 200;
-			posicaoYTitulo = 200;// Posição Y inicial da seta
-			// Defina outras posições ou valores iniciais necessários para a tela inicial
-
-			// Inicialize os timers novamente, se necessário
-			// ...
-
-			// Reinicie a tela inicial
+			posicaoYTitulo = 200;
 			repaint(); // Redesenha a tela inicial com os novos valores
 		}
 
-		// Restante do código de verificação de teclas
 	}
 
 }
